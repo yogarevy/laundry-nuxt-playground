@@ -1,10 +1,12 @@
 <template>
   <div>
     <h1 class="title">Customers</h1>
+    <hr />
     <div class="row">
       <div class="col-md-12">
         <b-card>
           <b-card-title class="mb-3">List Customers</b-card-title>
+          <hr />
           <div class="row my-3">
             <div class="col-md-4">
               <b-form-group
@@ -81,6 +83,17 @@
                   {{ row.value.customer_name }}
                 </template>
 
+                <template #cell(is_active)="row">
+                  <span
+                    :class="[
+                      row.value === 'Active'
+                        ? 'badge badge-success'
+                        : 'badge badge-secondary',
+                    ]"
+                    >{{ row.value }}</span
+                  >
+                </template>
+
                 <template #cell(actions)="row">
                   <b-button size="sm" @click="row.toggleDetails">
                     {{ row.detailsShowing ? 'Hide' : 'Show' }} Details
@@ -136,19 +149,17 @@ export default {
           key: 'customer_name',
           label: 'CUSTOMER NAME',
           sortable: true,
-          class: 'text-center',
         },
         {
           key: 'email',
           label: 'CUSTOMER EMAIL',
           sortable: true,
-          class: 'text-center',
         },
         {
           key: 'is_active',
           label: 'STATUS',
           formatter: (value, key, item) => {
-            return value ? 'Active' : 'No'
+            return value ? 'Active' : 'Deactive'
           },
           sortable: true,
           sortByFormatted: true,
@@ -187,7 +198,6 @@ export default {
   },
   watch: {
     params(newParams, oldParams) {
-      console.log(newParams)
       this.fetchData(newParams)
       this.$refs.tabel.$forceUpdate()
     },
