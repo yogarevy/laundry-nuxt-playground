@@ -41,7 +41,7 @@ export default {
   data() {
     return {
       isToggle: true,
-      username: this.$auth.user.username,
+      username: this.$auth.$storage.getUniversal('user').username,
     }
   },
   methods: {
@@ -53,6 +53,7 @@ export default {
     },
     async logout() {
       await this.$auth.logout()
+      this.$auth.$storage.removeUniversal('user')
       this.SET_IS_AUTH(false)
       this.$router.push('/login')
     },

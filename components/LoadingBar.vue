@@ -1,6 +1,6 @@
 <template>
-  <div v-if="loading" class="loading-page">
-    <p>Loading...</p>
+  <div v-if="loading" class="loading-page text-primary">
+    <b-spinner class="align-middle spining" label="Large Spinner"></b-spinner>
   </div>
 </template>
 
@@ -14,7 +14,7 @@ export default {
       this.loading = true
     },
     finish() {
-      this.loading = false
+      setTimeout(() => (this.loading = false), 2000)
     },
   },
 }
@@ -27,10 +27,14 @@ export default {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 1);
   text-align: center;
-  padding-top: 200px;
-  font-size: 30px;
-  font-family: sans-serif;
+  padding-top: 300px;
+  z-index: 1000;
+}
+
+.spining {
+  width: 3rem;
+  height: 3rem;
 }
 </style>

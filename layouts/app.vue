@@ -90,6 +90,7 @@ html {
 
 .wrapper {
   margin-top: 56px;
+  margin-bottom: 50px;
   display: flex;
   width: 100%;
 }

@@ -9,7 +9,11 @@
             </NuxtLink>
           </li>
           <li>
-            <a v-b-toggle.collapse-b href="javascript:void(0)">
+            <a
+              v-b-toggle.collapse-b
+              href="javascript:void(0)"
+              class="expand-class"
+            >
               <font-awesome-icon icon="users" /> Customers Management
               <span class="when-opened float-right">
                 <font-awesome-icon icon="chevron-down" />
@@ -99,7 +103,7 @@ a:focus {
 }
 
 #sidebar ul li.active > a,
-a[aria-expanded='true'] {
+.expand-class[aria-expanded='true'] {
   color: #35495e;
   background: #ddd;
 }

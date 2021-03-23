@@ -130,6 +130,7 @@ export default {
           this.loading = false
           const user = res.data.user
           this.$auth.setUser(user)
+          this.$auth.$storage.setUniversal('user', user, true)
           this.SET_IS_AUTH(true)
           this.$router.push('/dashboard')
         })

@@ -5,7 +5,16 @@
     <div class="row">
       <div class="col-md-12">
         <b-card>
-          <b-card-title class="mb-3">List Customers</b-card-title>
+          <div class="row">
+            <div class="col">
+              <b-card-title>List Customers</b-card-title>
+            </div>
+            <div class="col">
+              <b-button variant="primary" size="sm" class="float-right">
+                <font-awesome-icon icon="plus" /> ADD NEW
+              </b-button>
+            </div>
+          </div>
           <hr />
           <div class="row my-3">
             <div class="col-md-4">
@@ -77,10 +86,6 @@
                     <b-spinner class="align-middle"></b-spinner>
                     <strong>Loading...</strong>
                   </div>
-                </template>
-
-                <template #cell(name)="row">
-                  {{ row.value.customer_name }}
                 </template>
 
                 <template #cell(is_active)="row">
@@ -172,7 +177,7 @@ export default {
       totalRows: 0,
       currentPage: 1,
       perPage: 5,
-      pageOptions: [5, 10, 15, 20],
+      pageOptions: [5, 10, 15, 20, 50],
       sortBy: '',
       sortDesc: false,
       sortDirection: 'asc',
