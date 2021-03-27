@@ -108,6 +108,12 @@
                   <b-button size="sm" @click="row.toggleDetails">
                     {{ row.detailsShowing ? 'Hide' : 'Show' }} Details
                   </b-button>
+                  <b-button variant="success" size="sm" @click="row.isEdit">
+                    <font-awesome-icon icon="edit" />
+                  </b-button>
+                  <b-button variant="danger" size="sm" @click="row.isDelete">
+                    <font-awesome-icon icon="trash" />
+                  </b-button>
                 </template>
 
                 <template #row-details="row">
