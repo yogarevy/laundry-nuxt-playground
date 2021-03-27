@@ -25,7 +25,8 @@
     "lodash.startcase": "^4.4.0",
     "nuxt": "^2.14.12",
     "nuxt-fontawesome": "^0.4.0",
-    "vee-validate": "^3.4.5"
+    "vee-validate": "^3.4.5",
+    "vue-sweetalert2": "^4.2.1"
   },
   "devDependencies": {
     "@nuxtjs/eslint-config": "^5.0.0",

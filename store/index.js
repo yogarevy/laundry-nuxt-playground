@@ -1,6 +1,7 @@
 export const state = () => ({
   isAuth: false,
   isSlideToggle: true,
+  counter: 0,
 })
 
 export const mutations = {
@@ -9,6 +10,9 @@ export const mutations = {
   },
   SET_TOGGLE($state, payload) {
     $state.isSlideToggle = payload
+  },
+  increment(state) {
+    state.counter++
   },
 }
 

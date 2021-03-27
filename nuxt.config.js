@@ -54,6 +54,7 @@ export default {
       }
     ],
     '@nuxtjs/auth-next',
+    'vue-sweetalert2/nuxt',
   ],
 
   auth: {

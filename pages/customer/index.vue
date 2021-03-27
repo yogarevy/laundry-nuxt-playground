@@ -10,7 +10,12 @@
               <b-card-title>List Customers</b-card-title>
             </div>
             <div class="col">
-              <b-button variant="primary" size="sm" class="float-right">
+              <b-button
+                variant="primary"
+                size="sm"
+                class="float-right"
+                @click="slideFormCreate()"
+              >
                 <font-awesome-icon icon="plus" /> ADD NEW
               </b-button>
             </div>
@@ -135,11 +140,14 @@
         </b-card>
       </div>
     </div>
+    <form-create @events="fetchData"></form-create>
   </div>
 </template>
 
 <script>
+import FormCreate from '~/components/customer/FormCreate.vue'
 export default {
+  components: { FormCreate },
   layout: 'app',
   data() {
     return {
@@ -184,6 +192,7 @@ export default {
       from: 0,
       to: 0,
       filter: '',
+      isFormCreate: true,
     }
   },
   computed: {
@@ -204,7 +213,6 @@ export default {
   watch: {
     params(newParams, oldParams) {
       this.fetchData(newParams)
-      this.$refs.tabel.$forceUpdate()
     },
   },
   created() {
@@ -230,6 +238,9 @@ export default {
         .catch((err) => {
           console.log(err)
         })
+    },
+    slideFormCreate() {
+      this.$store.commit('customer/SET_FORM_CREATE', this.isFormCreate)
     },
   },
 }

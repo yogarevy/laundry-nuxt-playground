@@ -71,7 +71,7 @@ a:focus {
   position: fixed;
   left: 0;
   height: 100vh;
-  z-index: 999;
+  z-index: 100;
   background: #fff;
   color: #35495e;
   transition: all 0.3s;
