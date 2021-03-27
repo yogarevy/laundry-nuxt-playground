@@ -250,7 +250,6 @@ export default {
               })
               .catch((error) => {
                 this.loading = false
-                console.log(error.response)
                 if (error.response.status !== 422) {
                   this.showAlert = true
                   this.errorMessage = error.response.data.errors[0][0].errors
@@ -264,7 +263,6 @@ export default {
           allowOutsideClick: () => !this.$swal.isLoading(),
         })
         .then((result) => {
-          console.log(result)
           if (!result.isConfirmed) {
             this.loading = false
           }
