@@ -108,7 +108,11 @@
                   <b-button size="sm" @click="row.toggleDetails">
                     {{ row.detailsShowing ? 'Hide' : 'Show' }} Details
                   </b-button>
-                  <b-button variant="success" size="sm" @click="row.isEdit">
+                  <b-button
+                    variant="success"
+                    size="sm"
+                    @click="edit(row.item.id)"
+                  >
                     <font-awesome-icon icon="edit" />
                   </b-button>
                   <b-button variant="danger" size="sm" @click="row.isDelete">
@@ -147,13 +151,15 @@
       </div>
     </div>
     <form-create @events="fetchData"></form-create>
+    <form-edit @events="fetchData"></form-edit>
   </div>
 </template>
 
 <script>
 import FormCreate from '~/components/customer/FormCreate.vue'
+import FormEdit from '~/components/customer/FormEdit.vue'
 export default {
-  components: { FormCreate },
+  components: { FormCreate, FormEdit },
   layout: 'app',
   data() {
     return {
@@ -199,6 +205,7 @@ export default {
       to: 0,
       filter: '',
       isFormCreate: true,
+      isFormEdit: true,
     }
   },
   computed: {
@@ -247,6 +254,10 @@ export default {
     },
     slideFormCreate() {
       this.$store.commit('customer/SET_FORM_CREATE', this.isFormCreate)
+    },
+    edit(id) {
+      const edit = { id_edit: id, is_form_edit: this.isFormEdit }
+      this.$store.commit('customer/SET_FORM_EDIT', edit)
     },
   },
 }
