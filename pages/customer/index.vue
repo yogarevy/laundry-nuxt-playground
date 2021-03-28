@@ -106,7 +106,9 @@
 
                 <template #cell(actions)="row">
                   <b-button size="sm" @click="row.toggleDetails">
-                    {{ row.detailsShowing ? 'Hide' : 'Show' }} Details
+                    <font-awesome-icon
+                      :icon="row.detailsShowing ? 'eye-slash' : 'eye'"
+                    />
                   </b-button>
                   <b-button
                     variant="success"
@@ -122,11 +124,30 @@
 
                 <template #row-details="row">
                   <b-card>
-                    <ul>
-                      <li v-for="(value, key) in row.item" :key="key">
-                        {{ key }}: {{ value }}
-                      </li>
-                    </ul>
+                    <table class="table table-striped table-hover">
+                      <tbody>
+                        <tr>
+                          <td>Customer Code:</td>
+                          <td>{{ row.item.customer_code }}</td>
+                        </tr>
+                        <tr>
+                          <td>Customer Name:</td>
+                          <td>{{ row.item.customer_name }}</td>
+                        </tr>
+                        <tr>
+                          <td>Customer Email:</td>
+                          <td>{{ row.item.email }}</td>
+                        </tr>
+                        <tr>
+                          <td>Phone Number:</td>
+                          <td>{{ row.item.phone_number }}</td>
+                        </tr>
+                        <tr>
+                          <td>Group:</td>
+                          <td>{{ row.item.group_name }}</td>
+                        </tr>
+                      </tbody>
+                    </table>
                   </b-card>
                 </template>
               </b-table>
