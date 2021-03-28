@@ -70,7 +70,7 @@
           <div class="row my-3">
             <div class="col-md-12">
               <b-table
-                ref="tabel"
+                ref="tabelCustomer"
                 striped
                 hover
                 :items="items"
@@ -117,7 +117,11 @@
                   >
                     <font-awesome-icon icon="edit" />
                   </b-button>
-                  <b-button variant="danger" size="sm" @click="row.isDelete">
+                  <b-button
+                    variant="danger"
+                    size="sm"
+                    @click="destroy(row.item.id)"
+                  >
                     <font-awesome-icon icon="trash" />
                   </b-button>
                 </template>
@@ -279,6 +283,49 @@ export default {
     edit(id) {
       const edit = { id_edit: id, is_form_edit: this.isFormEdit }
       this.$store.commit('customer/SET_FORM_EDIT', edit)
+    },
+    destroy(id) {
+      this.$swal
+        .fire({
+          title: 'Hapus data customer?',
+          html: 'Anda tidak dapat mengembalikan data yang sudah dihapus.',
+          icon: 'warning',
+          showLoaderOnConfirm: true,
+          showCancelButton: true,
+          confirmButtonColor: '#6c757d',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'Hapus!',
+          cancelButtonText: 'Batal',
+          preConfirm: (confirm) => {
+            return this.$axios
+              .post('/api/customer/delete/' + id)
+              .then((res) => {
+                this.$swal.fire({
+                  text: 'Data berhasil dihapus.',
+                  icon: 'success',
+                  allowOutsideClick: false,
+                  preConfirm: (success) => {
+                    this.fetchData(this.params)
+                  },
+                })
+              })
+              .catch((error) => {
+                console.log(error.response)
+                this.$swal.fire({
+                  text: 'Terjadi kesalahan. Error:' + error,
+                  icon: 'error',
+                  allowOutsideClick: false,
+                  preConfirm: (pre) => {
+                    console.log(pre)
+                  },
+                })
+              })
+          },
+          allowOutsideClick: () => !this.$swal.isLoading(),
+        })
+        .then((result) => {
+          console.log(result)
+        })
     },
   },
 }

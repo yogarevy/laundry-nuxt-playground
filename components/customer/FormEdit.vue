@@ -124,7 +124,9 @@
                   switch
                 >
                   <b>
-                    ({{ customer.is_active === true ? 'Active' : 'Deactive' }})
+                    ({{
+                      customer.is_active === 'true' ? 'Active' : 'Deactive'
+                    }})
                   </b>
                 </b-form-checkbox>
                 <b-form-invalid-feedback class="input-live-feedback">
