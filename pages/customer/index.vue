@@ -183,9 +183,9 @@
       </div>
     </div>
     <!-- FORM CREATE SECTION -->
-    <form-create @events="fetchData"></form-create>
+    <form-create :sendparam="params" @events="fetchData($event)"></form-create>
     <!-- FORM EDIT SECTION -->
-    <form-edit @events="fetchData"></form-edit>
+    <form-edit :sendparam="params" @events="fetchData($event)"></form-edit>
   </div>
 </template>
 

@@ -1,20 +1,26 @@
 <template>
   <div>
+    <!-- TRANSITION ANIMATION FORM -->
     <transition name="slide-fade">
       <div v-if="isEditToggle" id="form-create">
+        <!-- SPINNER SHOW WHEN LOAD DATA -->
         <div v-if="isLoading" class="text-center text-primary is-loading">
           <b-spinner class="align-middle load-spinner"></b-spinner>
         </div>
+        <!-- BUTTON CLOSE FORM -->
         <a href="javascript:void(0)" class="form-close" @click="formClose()">
           <font-awesome-icon id="close_form" icon="times" />
         </a>
         <h2>Ubah Customer</h2>
         <hr />
+        <!-- FORM START -->
         <ValidationObserver ref="formCustomer">
           <b-form>
+            <!-- ALERT SECTION FOR ERROR -->
             <b-alert v-model="showAlert" variant="danger" dismissible>
               {{ errorMessage }}
             </b-alert>
+            <!-- NAME FIELD -->
             <ValidationProvider
               v-slot="errors"
               vid="customer_name"
@@ -38,7 +44,7 @@
                 </b-form-invalid-feedback>
               </b-form-group>
             </ValidationProvider>
-
+            <!-- EMAIL FIELD -->
             <ValidationProvider
               v-slot="errors"
               vid="customer_email"
@@ -62,7 +68,7 @@
                 </b-form-invalid-feedback>
               </b-form-group>
             </ValidationProvider>
-
+            <!-- PHONE NUMBER FIELD -->
             <ValidationProvider
               v-slot="errors"
               vid="phone_number"
@@ -88,7 +94,7 @@
                 </b-form-invalid-feedback>
               </b-form-group>
             </ValidationProvider>
-
+            <!-- ADDRESS DIELD -->
             <ValidationProvider
               v-slot="errors"
               vid="customer_address"
@@ -113,7 +119,7 @@
                 </b-form-invalid-feedback>
               </b-form-group>
             </ValidationProvider>
-
+            <!-- STATUS FIELD -->
             <ValidationProvider v-slot="errors" vid="status" name="status">
               <b-form-group id="status_group" label="Status" label-for="status">
                 <b-form-checkbox
@@ -124,9 +130,7 @@
                   switch
                 >
                   <b>
-                    ({{
-                      customer.is_active === 'true' ? 'Active' : 'Deactive'
-                    }})
+                    ({{ customer.is_active === true ? 'Active' : 'Deactive' }})
                   </b>
                 </b-form-checkbox>
                 <b-form-invalid-feedback class="input-live-feedback">
@@ -134,7 +138,7 @@
                 </b-form-invalid-feedback>
               </b-form-group>
             </ValidationProvider>
-
+            <!-- BUTTON SAVE -->
             <b-button
               block
               variant="primary"
@@ -151,6 +155,7 @@
         </ValidationObserver>
       </div>
     </transition>
+    <!-- OVERLAY SHOW WHEN FORM OPENED -->
     <div v-if="isEditToggle" class="overlay"></div>
   </div>
 </template>
@@ -164,6 +169,7 @@ export default {
     ValidationProvider,
     ValidationObserver,
   },
+  props: { sendparam: { type: [String], default: '' } }, // get data param from parent to child
   data() {
     return {
       customer: {
@@ -181,19 +187,20 @@ export default {
     }
   },
   computed: {
-    ...mapState('customer', ['isEditToggle', 'idEdit']),
+    ...mapState('customer', ['isEditToggle', 'idEdit']), // Get data from toggle to open Form Edit
     getIdParam() {
       return this.idEdit
-    },
+    }, // function get id data that stored from state
   },
   watch: {
     getIdParam(idParam) {
       if (idParam !== '') {
         this.fetchEditData(idParam)
       }
-    },
+    }, // watching changes of id data
   },
   methods: {
+    // Function for close form edit and reset all field
     formClose() {
       const formClose = { id_edit: '', is_form_edit: false }
       this.$store.commit('customer/SET_FORM_EDIT', formClose)
@@ -206,9 +213,11 @@ export default {
         is_active: false,
       }
     },
+    // Function to get validate from server and show to form field
     getValidationState({ dirty, validated, valid = null }) {
       return dirty || validated ? (valid !== false ? null : valid) : null
     },
+    // Start client side validation field phone number only allow number
     filterKey(e) {
       const key = e.key
       // If is '.' key, stop it
@@ -226,29 +235,56 @@ export default {
       this.customer.phone_number = e.replace(/[^0-9]+/g, '')
       return this.customer.phone_number
     },
+    // Fetching data by id when data action edit clicked by user
     fetchEditData(idParam) {
       this.isLoading = true
       this.$axios
         .get('/api/customer/show/' + idParam)
         .then((res) => {
           if (res.status === 200) {
+            let isActive = res.data.data.item.is_active
+            if (isActive === 1) {
+              isActive = true
+            } else {
+              isActive = false
+            }
             this.customer = {
               id: res.data.data.item.id,
               customer_name: res.data.data.item.customer_name,
               email: res.data.data.item.email,
               phone_number: res.data.data.item.phone_number,
               customer_address: res.data.data.item.customer_address,
-              is_active: res.data.data.item.is_active === 1 ? 'true' : 'false',
+              is_active: isActive,
               group_id: res.data.data.item.group_id,
             }
             this.isLoading = false
           }
         })
         .catch((err) => {
-          console.log(err)
+          if (err.response.status === 404) {
+            this.$swal({
+              text: err.response.statusText,
+              icon: 'error',
+              allowOutsideClick: false,
+              preConfirm: (errResult) => {
+                this.formClose()
+              },
+            })
+          } else {
+            this.$swal({
+              text: err.response.data.meta.errors[0][0].errors,
+              icon: 'error',
+              allowOutsideClick: false,
+              preConfirm: (errResult) => {
+                this.formClose()
+              },
+            })
+          }
         })
     },
+    // Function for update edited data of custumer
     updateCustomer() {
+      // inital data
       if (this.loading) {
         return
       }
@@ -263,52 +299,54 @@ export default {
         is_active: this.customer.is_active ? 1 : 0,
         group_id: this.customer.group_id,
       }
-      this.$swal
-        .fire({
-          title: 'Ubah data customer?',
-          html:
-            'Silakan periksa kembali data yang sudah diinputkan sebelum diubah.',
-          icon: 'warning',
-          showLoaderOnConfirm: true,
-          showCancelButton: true,
-          confirmButtonColor: '#17a2b8',
-          cancelButtonColor: '#d33',
-          confirmButtonText: 'Ubah!',
-          cancelButtonText: 'Batal',
-          preConfirm: (confirm) => {
-            return this.$axios
-              .post('/api/customer/edit/' + idCustomer, data)
-              .then((res) => {
-                this.loading = false
-                this.$swal.fire({
-                  text: 'Data berhasil diupdate',
-                  icon: 'success',
+      // Process update customer
+      this.$swal({
+        title: 'Ubah data customer?',
+        html:
+          'Silakan periksa kembali data yang sudah diinputkan sebelum diubah.',
+        icon: 'warning',
+        showLoaderOnConfirm: true,
+        showCancelButton: true,
+        confirmButtonColor: '#17a2b8',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Ubah!',
+        cancelButtonText: 'Batal',
+        preConfirm: (confirm) => {
+          return this.$axios
+            .post('/api/customer/edit/' + idCustomer, data)
+            .then((res) => {
+              this.loading = false
+              this.formClose()
+              this.$swal({
+                text: 'Data berhasil diupdate',
+                icon: 'success',
+                allowOutsideClick: false,
+                preConfirm: (success) => {
+                  this.$emit('events', this.sendparam)
+                },
+              })
+            })
+            .catch((error) => {
+              this.loading = false
+              if (error.response.status !== 422) {
+                this.showAlert = true
+                this.errorMessage = error.response.data.meta.errors[0][0].errors
+                this.$swal({
+                  text: error.response.data.meta.errors[0][0].errors,
+                  icon: 'error',
                   allowOutsideClick: false,
-                  preConfirm: (success) => {
-                    this.$emit('events', '?limit=5&page=1')
-                    this.formClose()
-                  },
                 })
-              })
-              .catch((error) => {
-                this.loading = false
-                if (error.response.status !== 422) {
-                  this.showAlert = true
-                  this.errorMessage = error.response.data.errors[0][0].errors
-                } else {
-                  this.$refs.formCustomer.setErrors(
-                    error.response.data.errors[0]
-                  )
-                }
-              })
-          },
-          allowOutsideClick: () => !this.$swal.isLoading(),
-        })
-        .then((result) => {
-          if (!result.isConfirmed) {
-            this.loading = false
-          }
-        })
+              } else {
+                this.$refs.formCustomer.setErrors(error.response.data.errors[0])
+              }
+            })
+        },
+        allowOutsideClick: () => !this.$swal.isLoading(),
+      }).then((result) => {
+        if (!result.isConfirmed) {
+          this.loading = false
+        }
+      })
     },
   },
 }

@@ -165,6 +165,7 @@ export default {
     ValidationProvider,
     ValidationObserver,
   },
+  props: { sendparam: { type: [String], default: '' } }, // get data param from parent to child
   data() {
     return {
       customer: {
@@ -248,13 +249,13 @@ export default {
             .post('/api/customer/create', data)
             .then((res) => {
               this.loading = false
+              this.formClose()
               this.$swal({
                 text: 'Data berhasil disimpan',
                 icon: 'success',
                 allowOutsideClick: false,
                 preConfirm: (success) => {
                   this.$emit('events', '?limit=5&page=1')
-                  this.formClose()
                 },
               })
             })
