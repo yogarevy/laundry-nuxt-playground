@@ -1,17 +1,22 @@
 <template>
   <div>
+    <!-- TRANSITION ANIMATION FORM -->
     <transition name="slide-fade">
       <div v-if="isCreateToggle" id="form-create">
+        <!-- BUTTON CLOSE FORM -->
         <a href="javascript:void(0)" class="form-close" @click="formClose()">
           <font-awesome-icon id="close_form" icon="times" />
         </a>
         <h2>Tambah Customer</h2>
         <hr />
+        <!-- FORM START -->
         <ValidationObserver ref="formCustomer">
           <b-form>
+            <!-- ALERT SECTION FOR ERROR -->
             <b-alert v-model="showAlert" variant="danger" dismissible>
               {{ errorMessage }}
             </b-alert>
+            <!-- NAME FIELD -->
             <ValidationProvider
               v-slot="errors"
               vid="customer_name"
@@ -35,7 +40,7 @@
                 </b-form-invalid-feedback>
               </b-form-group>
             </ValidationProvider>
-
+            <!-- EMAIL FIELD -->
             <ValidationProvider
               v-slot="errors"
               vid="customer_email"
@@ -59,7 +64,7 @@
                 </b-form-invalid-feedback>
               </b-form-group>
             </ValidationProvider>
-
+            <!-- PHONE NUMBER FIELD -->
             <ValidationProvider
               v-slot="errors"
               vid="phone_number"
@@ -85,7 +90,7 @@
                 </b-form-invalid-feedback>
               </b-form-group>
             </ValidationProvider>
-
+            <!-- ADDRESS DIELD -->
             <ValidationProvider
               v-slot="errors"
               vid="customer_address"
@@ -110,7 +115,7 @@
                 </b-form-invalid-feedback>
               </b-form-group>
             </ValidationProvider>
-
+            <!-- STATUS FIELD -->
             <ValidationProvider v-slot="errors" vid="status" name="status">
               <b-form-group id="status_group" label="Status" label-for="status">
                 <b-form-checkbox
@@ -129,7 +134,7 @@
                 </b-form-invalid-feedback>
               </b-form-group>
             </ValidationProvider>
-
+            <!-- BUTTON SAVE -->
             <b-button
               block
               variant="primary"
@@ -146,6 +151,7 @@
         </ValidationObserver>
       </div>
     </transition>
+    <!-- OVERLAY SHOW WHEN FORM OPENED -->
     <div v-if="isCreateToggle" class="overlay"></div>
   </div>
 </template>
@@ -174,9 +180,10 @@ export default {
     }
   },
   computed: {
-    ...mapState('customer', ['isCreateToggle']),
+    ...mapState('customer', ['isCreateToggle']), // Get data from toggle to open form create
   },
   methods: {
+    // Function to close Form Create Customer and reset all field
     formClose() {
       this.$store.commit('customer/SET_FORM_CREATE', false)
       this.customer = {
@@ -187,9 +194,11 @@ export default {
         is_active: false,
       }
     },
+    // Function to get validate from server and show to form field
     getValidationState({ dirty, validated, valid = null }) {
       return dirty || validated ? (valid !== false ? null : valid) : null
     },
+    // Start client side validation field phone number only allow number
     filterKey(e) {
       const key = e.key
       // If is '.' key, stop it
@@ -207,7 +216,9 @@ export default {
       this.customer.phone_number = e.replace(/[^0-9]+/g, '')
       return this.customer.phone_number
     },
+    // Function for saving/store data customer
     saveCustomer() {
+      // inital data
       if (this.loading) {
         return
       }
@@ -220,53 +231,49 @@ export default {
         customer_address: this.customer.customer_address,
         is_active: this.customer.is_active ? 1 : 0,
       }
-      console.log(data)
-      this.$swal
-        .fire({
-          title: 'Simpan data customer?',
-          html:
-            'Silakan periksa kembali data yang sudah diinputkan sebelum disimpan.',
-          icon: 'warning',
-          showLoaderOnConfirm: true,
-          showCancelButton: true,
-          confirmButtonColor: '#17a2b8',
-          cancelButtonColor: '#d33',
-          confirmButtonText: 'Simpan!',
-          cancelButtonText: 'Batal',
-          preConfirm: (confirm) => {
-            return this.$axios
-              .post('/api/customer/create', data)
-              .then((res) => {
-                this.loading = false
-                this.$swal.fire({
-                  text: 'Data berhasil disimpan',
-                  icon: 'success',
-                  allowOutsideClick: false,
-                  preConfirm: (success) => {
-                    this.$emit('events', '?limit=5&page=1')
-                    this.formClose()
-                  },
-                })
+      // Process saving data
+      this.$swal({
+        title: 'Simpan data customer?',
+        html:
+          'Silakan periksa kembali data yang sudah diinputkan sebelum disimpan.',
+        icon: 'warning',
+        showLoaderOnConfirm: true,
+        showCancelButton: true,
+        confirmButtonColor: '#17a2b8',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Simpan!',
+        cancelButtonText: 'Batal',
+        preConfirm: (confirm) => {
+          return this.$axios
+            .post('/api/customer/create', data)
+            .then((res) => {
+              this.loading = false
+              this.$swal({
+                text: 'Data berhasil disimpan',
+                icon: 'success',
+                allowOutsideClick: false,
+                preConfirm: (success) => {
+                  this.$emit('events', '?limit=5&page=1')
+                  this.formClose()
+                },
               })
-              .catch((error) => {
-                this.loading = false
-                if (error.response.status !== 422) {
-                  this.showAlert = true
-                  this.errorMessage = error.response.data.errors[0][0].errors
-                } else {
-                  this.$refs.formCustomer.setErrors(
-                    error.response.data.errors[0]
-                  )
-                }
-              })
-          },
-          allowOutsideClick: () => !this.$swal.isLoading(),
-        })
-        .then((result) => {
-          if (!result.isConfirmed) {
-            this.loading = false
-          }
-        })
+            })
+            .catch((error) => {
+              this.loading = false
+              if (error.response.status !== 422) {
+                this.showAlert = true
+                this.errorMessage = error.response.data.errors[0][0].errors
+              } else {
+                this.$refs.formCustomer.setErrors(error.response.data.errors[0])
+              }
+            })
+        },
+        allowOutsideClick: () => !this.$swal.isLoading(),
+      }).then((result) => {
+        if (!result.isConfirmed) {
+          this.loading = false
+        }
+      })
     },
   },
 }
