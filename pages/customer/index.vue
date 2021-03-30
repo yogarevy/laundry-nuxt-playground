@@ -9,6 +9,7 @@
             <div class="col">
               <b-card-title>List Customers</b-card-title>
             </div>
+            <!-- BUTTON CREATE NEW CUSTOMER -->
             <div class="col">
               <b-button
                 variant="primary"
@@ -22,6 +23,7 @@
           </div>
           <hr />
           <div class="row my-3">
+            <!-- SELECT PAGE LIMIT -->
             <div class="col-md-4">
               <b-form-group
                 label="Per page"
@@ -41,6 +43,7 @@
                 ></b-form-select>
               </b-form-group>
             </div>
+            <!-- FORM SEARCH DATA -->
             <div class="col-md-8">
               <b-form-group
                 label="Filter"
@@ -68,6 +71,7 @@
             </div>
           </div>
           <div class="row my-3">
+            <!-- TABLE DATA CUSTOMER -->
             <div class="col-md-12">
               <b-table
                 ref="tabelCustomer"
@@ -86,13 +90,14 @@
                 show-empty
                 outlined
               >
+                <!-- THIS WILL SHOW LOADING SPINNER EVERY LOAD DATA -->
                 <template #table-busy>
                   <div class="text-center text-primary my-2">
                     <b-spinner class="align-middle"></b-spinner>
                     <strong>Loading...</strong>
                   </div>
                 </template>
-
+                <!-- ADD HTML TO DATA -->
                 <template #cell(is_active)="row">
                   <span
                     :class="[
@@ -103,7 +108,7 @@
                     >{{ row.value }}</span
                   >
                 </template>
-
+                <!-- CUSTOM BUTTON FOR ACTION -->
                 <template #cell(actions)="row">
                   <b-button size="sm" @click="row.toggleDetails">
                     <font-awesome-icon
@@ -125,7 +130,7 @@
                     <font-awesome-icon icon="trash" />
                   </b-button>
                 </template>
-
+                <!-- THIS WILL SHOW/HIDE WHEN DETAIL ACTION CLICKED -->
                 <template #row-details="row">
                   <b-card>
                     <table class="table table-striped table-hover">
@@ -157,6 +162,7 @@
               </b-table>
             </div>
           </div>
+          <!-- PAGINATION TABLE -->
           <div class="row justify-content-end">
             <div class="col-md-6">
               <b-pagination
@@ -169,13 +175,16 @@
               ></b-pagination>
             </div>
           </div>
+          <!-- INFORMATION DATA IN TABLE -->
           <b-card-text class="small text-muted">
             Showing {{ from }} to {{ to }} of {{ totalRows }} rows
           </b-card-text>
         </b-card>
       </div>
     </div>
+    <!-- FORM CREATE SECTION -->
     <form-create @events="fetchData"></form-create>
+    <!-- FORM EDIT SECTION -->
     <form-edit @events="fetchData"></form-edit>
   </div>
 </template>
@@ -216,10 +225,10 @@ export default {
           filterByFormatted: true,
         },
         { key: 'actions', label: 'Actions' },
-      ],
+      ], // Field for head table
       isBusy: false,
-      items: this.items,
-      totalRows: 0,
+      items: this.items, // inital data for table
+      totalRows: 0, // START initial pagination table
       currentPage: 1,
       perPage: 5,
       pageOptions: [5, 10, 15, 20, 50],
@@ -228,12 +237,13 @@ export default {
       sortDirection: 'asc',
       from: 0,
       to: 0,
-      filter: '',
+      filter: '', // END initial pagination table
       isFormCreate: true,
       isFormEdit: true,
     }
   },
   computed: {
+    // Create param for API URL
     params() {
       let params = '?limit=' + this.perPage + '&page=' + this.currentPage
       if (this.sortBy) {
@@ -250,13 +260,14 @@ export default {
   },
   watch: {
     params(newParams, oldParams) {
-      this.fetchData(newParams)
+      this.fetchData(newParams) // watch every changes of parameter API URL
     },
   },
   created() {
-    this.fetchData(this.params) // initial fetch
+    this.fetchData(this.params) // initial fetch data on load page
   },
   methods: {
+    // Function Fetch Data From API
     fetchData(newParams) {
       this.isBusy = true
       this.items = []
@@ -271,61 +282,74 @@ export default {
             this.to = res.data.page_info.to
             this.totalRows = res.data.page_info.total
             return this.items
+          } else {
+            this.$swal({
+              text: res.data.errors,
+              icon: 'error',
+              allowOutsideClick: false,
+            })
           }
         })
         .catch((err) => {
-          console.log(err)
+          this.$swal({
+            text: err.response.statusText,
+            icon: 'error',
+            allowOutsideClick: false,
+          })
         })
     },
+    // Function Open Form Create Component
     slideFormCreate() {
       this.$store.commit('customer/SET_FORM_CREATE', this.isFormCreate)
     },
+    // Function Open Form Edit Component
     edit(id) {
       const edit = { id_edit: id, is_form_edit: this.isFormEdit }
       this.$store.commit('customer/SET_FORM_EDIT', edit)
     },
+    // Function Delete Data
     destroy(id) {
-      this.$swal
-        .fire({
-          title: 'Hapus data customer?',
-          html: 'Anda tidak dapat mengembalikan data yang sudah dihapus.',
-          icon: 'warning',
-          showLoaderOnConfirm: true,
-          showCancelButton: true,
-          confirmButtonColor: '#6c757d',
-          cancelButtonColor: '#d33',
-          confirmButtonText: 'Hapus!',
-          cancelButtonText: 'Batal',
-          preConfirm: (confirm) => {
-            return this.$axios
-              .post('/api/customer/delete/' + id)
-              .then((res) => {
-                this.$swal.fire({
-                  text: 'Data berhasil dihapus.',
-                  icon: 'success',
-                  allowOutsideClick: false,
-                  preConfirm: (success) => {
-                    this.fetchData(this.params)
-                  },
-                })
+      this.$swal({
+        title: 'Hapus data customer?',
+        html: 'Anda tidak dapat mengembalikan data yang sudah dihapus.',
+        icon: 'warning',
+        showLoaderOnConfirm: true,
+        showCancelButton: true,
+        confirmButtonColor: '#6c757d',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Hapus!',
+        cancelButtonText: 'Batal',
+        preConfirm: (confirm) => {
+          return this.$axios
+            .post('/api/customer/delete/' + id)
+            .then((res) => {
+              this.$swal({
+                text: 'Data berhasil dihapus.',
+                icon: 'success',
+                allowOutsideClick: false,
+                preConfirm: (success) => {
+                  this.fetchData(this.params)
+                },
               })
-              .catch((error) => {
-                console.log(error.response)
-                this.$swal.fire({
-                  text: 'Terjadi kesalahan. Error:' + error,
-                  icon: 'error',
-                  allowOutsideClick: false,
-                  preConfirm: (pre) => {
-                    console.log(pre)
-                  },
-                })
+            })
+            .catch((error) => {
+              this.$swal({
+                text:
+                  'Terjadi kesalahan. Error: ' +
+                  error.response.data.meta.errors[0][0].errors,
+                icon: 'error',
+                allowOutsideClick: false,
               })
-          },
-          allowOutsideClick: () => !this.$swal.isLoading(),
+            })
+        },
+        allowOutsideClick: () => !this.$swal.isLoading(),
+      }).then((result) => {
+        this.$swal({
+          text: result.response.data.meta.errors[0][0].errors,
+          icon: 'error',
+          allowOutsideClick: false,
         })
-        .then((result) => {
-          console.log(result)
-        })
+      })
     },
   },
 }
